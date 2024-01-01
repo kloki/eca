@@ -1,3 +1,10 @@
+use rand::Rng;
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum Init {
+    Random,
+    Single,
+}
+
 pub struct RuleSet {
     rules: [bool; 8],
 }
@@ -16,6 +23,60 @@ impl RuleSet {
 
     pub fn apply_rules(&self, l: bool, m: bool, r: bool) -> bool {
         self.rules[(l as usize) * 4 + (m as usize) * 2 + (r as usize)]
+    }
+}
+
+pub struct Eca {
+    pub iterations: Vec<Vec<bool>>,
+    rs: RuleSet,
+}
+
+impl Eca {
+    pub fn new(width: usize, initialization: Init, rs: RuleSet) -> Self {
+        let mut init = vec![false; width];
+        match initialization {
+            Init::Single => init[(width / 2) as usize] = true,
+            Init::Random => {
+                let mut rng = rand::thread_rng();
+                for x in 0..(width - 1) {
+                    init[x] = rng.gen();
+                }
+            }
+        }
+
+        Eca {
+            iterations: vec![init],
+            rs,
+        }
+    }
+
+    pub fn iterate(&mut self, iterations: usize) {
+        let width = self.iterations[0].len() - 1;
+        for _ in 0..iterations {
+            let last = self.iterations.len() - 1;
+            let new = (0..self.iterations[last].len())
+                .map(|x| {
+                    let l = {
+                        if x > 0 {
+                            self.iterations[last][x - 1]
+                        } else {
+                            false
+                        }
+                    };
+                    let m = self.iterations[last][x];
+
+                    let r = {
+                        if x < width {
+                            self.iterations[last][x + 1]
+                        } else {
+                            false
+                        }
+                    };
+                    self.rs.apply_rules(l, m, r)
+                })
+                .collect::<Vec<bool>>();
+            self.iterations.push(new);
+        }
     }
 }
 
