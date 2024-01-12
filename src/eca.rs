@@ -57,19 +57,20 @@ impl Eca {
             let new = (0..self.iterations[last].len())
                 .map(|x| {
                     let l = {
-                        if x > 0 {
-                            self.iterations[last][x - 1]
+                        //wrap around if at the edges
+                        if x == 0 {
+                            self.iterations[last][width]
                         } else {
-                            false
+                            self.iterations[last][x - 1]
                         }
                     };
                     let m = self.iterations[last][x];
 
                     let r = {
-                        if x < width {
-                            self.iterations[last][x + 1]
+                        if x == width {
+                            self.iterations[last][0]
                         } else {
-                            false
+                            self.iterations[last][x + 1]
                         }
                     };
                     self.rs.apply_rules(l, m, r)
