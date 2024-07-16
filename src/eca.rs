@@ -85,6 +85,21 @@ impl Eca {
 mod tests {
     use super::*;
 
+    fn readable_iterations(iterations: Vec<Vec<bool>>) -> String {
+        let mut result = "".to_string();
+        for row in iterations {
+            for i in row.iter() {
+                if *i {
+                    result.push('█')
+                } else {
+                    result.push(' ')
+                }
+            }
+            result.push('\n')
+        }
+        result
+    }
+
     #[test]
     fn test_110() {
         let rs = RuleSet::new(110);
@@ -108,5 +123,38 @@ mod tests {
         assert!(rs.apply_rules(false, true, false));
         assert!(rs.apply_rules(false, false, true));
         assert!(!rs.apply_rules(false, false, false));
+    }
+
+    #[test]
+    fn test_30_iterations() {
+        let mut eca = Eca::new(80, Init::Single, RuleSet::new(30));
+        eca.iterate(80);
+        insta::assert_snapshot!(readable_iterations(eca.iterations));
+    }
+    #[test]
+    fn test_73_iterations() {
+        let mut eca = Eca::new(80, Init::Single, RuleSet::new(73));
+        eca.iterate(80);
+        insta::assert_snapshot!(readable_iterations(eca.iterations));
+    }
+    #[test]
+    fn test_90_iterations() {
+        let mut eca = Eca::new(80, Init::Single, RuleSet::new(90));
+        eca.iterate(80);
+        insta::assert_snapshot!(readable_iterations(eca.iterations));
+    }
+
+    #[test]
+    fn test_99_iterations() {
+        let mut eca = Eca::new(80, Init::Single, RuleSet::new(99));
+        eca.iterate(80);
+        insta::assert_snapshot!(readable_iterations(eca.iterations));
+    }
+
+    #[test]
+    fn test_110_iterations() {
+        let mut eca = Eca::new(80, Init::Single, RuleSet::new(110));
+        eca.iterate(80);
+        insta::assert_snapshot!(readable_iterations(eca.iterations));
     }
 }
