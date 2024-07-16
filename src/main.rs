@@ -1,55 +1,39 @@
 use clap::Parser;
-use eca::{
-    Eca,
-    Init,
-    RuleSet,
-};
-use image::{
-    ImageBuffer,
-    ImageError,
-    Rgb,
-};
+use eca::{Eca, Init, RuleSet};
 
 mod eca;
-const BLACK: image::Rgb<u8> = Rgb([0u8; 3]);
-const WHITE: image::Rgb<u8> = Rgb([255u8; 3]);
+mod writer;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Rule set to be applied
     rule_set: u8,
-    /// Name of png file
+    /// Name of output file
     #[arg(short, long, default_value = "./output.png")]
     output_file: String,
-    //width of image
+    //width of initalization
     #[arg(long, default_value_t = 800)]
     width: u32,
-    //height of image
+    //number of iterations
     #[arg(long, default_value_t = 400)]
-    height: u32,
+    iterations: u32,
     // how to initialize the first row
     #[arg(value_enum,short, long, default_value_t = Init::Single)]
     initalization: Init,
 }
 
-fn main() -> Result<(), ImageError> {
+fn main() {
     let args = Args::parse();
     let rs = RuleSet::new(args.rule_set);
     let width = args.width as usize;
-    let height = args.height as usize;
+    let iterations = args.iterations as usize;
     let mut eca = Eca::new(width, args.initalization, rs);
-    eca.iterate(height);
+    eca.iterate(iterations);
 
-    let mut imgbuf = ImageBuffer::new(args.width, args.height);
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        if eca.iterations[y as usize][x as usize] {
-            *pixel = BLACK
-        } else {
-            *pixel = WHITE
-        }
+    if args.output_file.ends_with(".png") {
+        writer::to_png(&args.output_file, eca.iterations).expect("failed to write image");
+    } else {
+        writer::to_txt(&args.output_file, eca.iterations).expect("failed to write to txt file")
     }
-
-    imgbuf.save(args.output_file)?;
-    Ok(())
 }
