@@ -35,11 +35,11 @@ impl Eca {
     pub fn new(width: usize, initialization: Init, rs: RuleSet) -> Self {
         let mut init = vec![false; width];
         match initialization {
-            Init::Single => init[(width / 2) as usize] = true,
+            Init::Single => init[width / 2] = true,
             Init::Random => {
                 let mut rng = rand::thread_rng();
-                for x in 0..(width - 1) {
-                    init[x] = rng.gen();
+                for i in init.iter_mut() {
+                    *i = rng.gen();
                 }
             }
         }
@@ -88,25 +88,25 @@ mod tests {
     #[test]
     fn test_110() {
         let rs = RuleSet::new(110);
-        assert_eq!(rs.apply_rules(true, true, true), false);
-        assert_eq!(rs.apply_rules(true, true, false), true);
-        assert_eq!(rs.apply_rules(true, false, true), true);
-        assert_eq!(rs.apply_rules(true, false, false), false);
-        assert_eq!(rs.apply_rules(false, true, true), true);
-        assert_eq!(rs.apply_rules(false, true, false), true);
-        assert_eq!(rs.apply_rules(false, false, true), true);
-        assert_eq!(rs.apply_rules(false, false, false), false);
+        assert!(!rs.apply_rules(true, true, true));
+        assert!(rs.apply_rules(true, true, false));
+        assert!(rs.apply_rules(true, false, true));
+        assert!(!rs.apply_rules(true, false, false));
+        assert!(rs.apply_rules(false, true, true));
+        assert!(rs.apply_rules(false, true, false));
+        assert!(rs.apply_rules(false, false, true));
+        assert!(!rs.apply_rules(false, false, false));
     }
     #[test]
     fn test_30() {
         let rs = RuleSet::new(30);
-        assert_eq!(rs.apply_rules(true, true, true), false);
-        assert_eq!(rs.apply_rules(true, true, false), false);
-        assert_eq!(rs.apply_rules(true, false, true), false);
-        assert_eq!(rs.apply_rules(true, false, false), true);
-        assert_eq!(rs.apply_rules(false, true, true), true);
-        assert_eq!(rs.apply_rules(false, true, false), true);
-        assert_eq!(rs.apply_rules(false, false, true), true);
-        assert_eq!(rs.apply_rules(false, false, false), false);
+        assert!(!rs.apply_rules(true, true, true));
+        assert!(!rs.apply_rules(true, true, false));
+        assert!(!rs.apply_rules(true, false, true));
+        assert!(rs.apply_rules(true, false, false));
+        assert!(rs.apply_rules(false, true, true));
+        assert!(rs.apply_rules(false, true, false));
+        assert!(rs.apply_rules(false, false, true));
+        assert!(!rs.apply_rules(false, false, false));
     }
 }
